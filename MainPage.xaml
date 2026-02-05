@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Habit_tracker.MainPage"
+             Title="Habit Tracker"
+             >
+
+    <VerticalStackLayout 
+        Padding="50"
+        Spacing="20"
+        Margin="50">
+        <Label 
+               Text = "Welcome to your Habit Tracker"
+               FontSize="Title"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"
+               TextColor="Purple"/>
+                
+        <Label
+               Text=" Habits take 21 days to build but it only starts with Day 1"
+               FontSize="Body" 
+               VerticalOptions="Center"
+               HorizontalOptions="Center"
+               TextColor="MediumPurple"/>
+        
+        
+        <Grid ColumnDefinitions="*,Auto" Margin="0,20">
+            <Entry Grid.Column="0"
+                     Placeholder="Enter a new habit"
+                     Text="{Binding NewHabitName}"
+                     TextColor="Purple"/>
+
+            <Button Grid.Column="1"
+                    Text="Add habit"
+                    Command="{Binding AddHabitCommand}"
+                    BackgroundColor="Beige"
+                    TextColor="Purple"/>
+        </Grid>
+        <CollectionView ItemsSource="{Binding Habits}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    
+                    <Border Stroke="Black" 
+                            StrokeShape="RoundRectangle 10" 
+                            Padding="10" Margin="0,5">
+                        <Border.Shadow>
+                            <Shadow Brush="Black"
+                                Offset="2,2"
+                                Radius="5"
+                                Opacity="0.2"/>
+                        </Border.Shadow>
+
+                        <Grid ColumnDefinitions="*, Auto">
+                            <Label Grid.Column="0"
+                                   Text="{Binding Title}"
+                                   VerticalOptions="Center"
+                                   TextColor="Purple"
+                                   FontSize="Body"/>
+                            <CheckBox Grid.Column="1"
+                                      IsChecked="{Binding IsCompleted}"
+                                      VerticalOptions="Center"/>
+                            
+
+                        </Grid>
+    
+                       
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+    
+
+</ContentPage>
