@@ -52,4 +52,41 @@ public partial class MainViewModel : ObservableObject
             Habits.Add(habit);
         }
     }
+
+    [RelayCommand]
+    async Task TapHabit(Habit habit) 
+    {
+        if (habit == null) return;
+
+        //check date logic
+        var today = DateTime.Today;
+        var yesterday = today.AddDays(-1);
+
+        habit.IsCompleted= !habit.IsCompleted;
+
+        if (habit.IsCompleted) 
+        { 
+            if(habit.LastCompletedDate == yesterday)
+            {
+                habit.StreakCount++;
+            }
+            else if (habit.LastCompletedDate < yesterday)
+            {
+                habit.StreakCount = 1;
+            }
+            else if (habit.LastCompletedDate.Date == today)
+            {
+                // Already done today, don't increase streak again
+            }
+
+            // Save the date
+            habit.LastCompletedDate = DateTime.Now;
+        }
+        
+        //database update logic
+        await _databaseService.UpdateAsync(habit);
+
+        //add sound here to play when habit is completed
+    }
+
 }

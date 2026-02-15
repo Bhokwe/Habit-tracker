@@ -10,7 +10,7 @@ namespace Habit_tracker
     {
 
         // the database name
-        public const string DatabaseFileName = "HabitTracker.db3";
+        public const string DatabaseFileName = "HabitTrackerFinalTest.db3";
 
         //setting up the database to read or write mode
         public const SQLite.SQLiteOpenFlags Flags =
