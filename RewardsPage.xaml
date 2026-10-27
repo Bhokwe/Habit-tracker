@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Habit_tracker.ViewModels"
+             xmlns:models="clr-namespace:Habit_tracker.Models"
+             x:Class="Habit_tracker.RewardsPage"
+             x:DataType="viewmodels:RewardsViewModel"
+             Title="Rewards"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="22,28,22,28" Spacing="16">
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="🏆"
+                       FontSize="28" />
+                <Label Text="Trophies &amp; treats"
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                <Label Text="Earn something lovely when you show up."
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+            </VerticalStackLayout>
+
+            <Border StrokeThickness="0"
+                    BackgroundColor="{DynamicResource AccentSoft}"
+                    StrokeShape="RoundRectangle 22"
+                    Padding="16">
+                <Label Text="{Binding InsightSummary}"
+                       FontSize="14"
+                       LineBreakMode="WordWrap"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray900}}" />
+            </Border>
+
+            <Border StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="New reward"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+                    <Entry Placeholder="Ice cream, movie night…"
+                           Text="{Binding NewRewardTitle}"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+                    <Editor Placeholder="Optional note"
+                            Text="{Binding NewRewardDescription}"
+                            AutoSize="TextChanges"
+                            HeightRequest="56"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+                    <Picker Title="Tied to habit"
+                            ItemsSource="{Binding HabitOptions}"
+                            ItemDisplayBinding="{Binding Title}"
+                            SelectedItem="{Binding SelectedHabit}" />
+
+                    <Entry Placeholder="Times this week (e.g. 5)"
+                           Text="{Binding NewTargetText}"
+                           Keyboard="Numeric"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+                    <Button Text="Add reward"
+                            Command="{Binding AddRewardCommand}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="White"
+                            CornerRadius="22"
+                            Padding="16,14"
+                            FontAttributes="Bold" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Your rewards"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   Margin="4,4,0,0"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+            <CollectionView ItemsSource="{Binding Rewards}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="28" Spacing="6">
+                        <Label Text="🎁" FontSize="36" HorizontalTextAlignment="Center" />
+                        <Label Text="No rewards yet"
+                               FontSize="17" FontAttributes="Bold" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                        <Label Text="Gym 5× → Magnum. Make it fun."
+                               FontSize="13" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Reward">
+                        <Border Margin="0,0,0,12"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 24"
+                                Padding="18"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                            <Border.Shadow>
+                                <Shadow Brush="{StaticResource Gray400}" Offset="0,6" Radius="16" Opacity="0.12" />
+                            </Border.Shadow>
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Border Grid.Column="0"
+                                            WidthRequest="48"
+                                            HeightRequest="48"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 16"
+                                            BackgroundColor="{DynamicResource AccentSoft}"
+                                            VerticalOptions="Start">
+                                        <Label Text="🏅"
+                                               FontSize="22"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                        <Label Text="{Binding Title}"
+                                               FontSize="17"
+                                               FontAttributes="Bold"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                                        <Label Text="{Binding RuleSummary}"
+                                               FontSize="12"
+                                               LineBreakMode="WordWrap"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="2"
+                                            Text="✕"
+                                            WidthRequest="36"
+                                            HeightRequest="36"
+                                            Padding="0"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:RewardsViewModel}}, Path=DeleteRewardCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+
+                                <Label Text="{Binding Description}"
+                                       IsVisible="{Binding HasDescription}"
+                                       FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+
+                                <ProgressBar Progress="{Binding Progress}"
+                                             ProgressColor="{DynamicResource StreakAccent}"
+                                             HeightRequest="10" />
+
+                                <Label Text="{Binding ProgressLabel}"
+                                       FontSize="13"
+                                       FontAttributes="Bold"
+                                       TextColor="{DynamicResource StreakAccent}" />
+
+                                <Button Text="Claim reward"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:RewardsViewModel}}, Path=ClaimRewardCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsEnabled="{Binding IsReady}"
+                                        BackgroundColor="{DynamicResource Success}"
+                                        TextColor="White"
+                                        CornerRadius="18"
+                                        Padding="12,12"
+                                        FontAttributes="Bold" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

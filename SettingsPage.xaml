@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Habit_tracker.ViewModels"
+             x:Class="Habit_tracker.SettingsPage"
+             x:DataType="viewmodels:SettingsViewModel"
+             Title="Look"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="22">
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Appearance"
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                <Label Text="{Binding ThemeSummary}"
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+            </VerticalStackLayout>
+
+            <!-- Theme mode -->
+            <Border StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="20">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Theme"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                    <Label Text="Automatic follows your device setting."
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0"
+                                Text="Auto"
+                                Command="{Binding SetThemeCommand}"
+                                CommandParameter="System"
+                                CornerRadius="18"
+                                FontSize="13"
+                                Padding="8,12"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                                TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsSystemTheme}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button Grid.Column="1"
+                                Text="Light"
+                                Command="{Binding SetThemeCommand}"
+                                CommandParameter="Light"
+                                CornerRadius="18"
+                                FontSize="13"
+                                Padding="8,12"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                                TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsLightTheme}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button Grid.Column="2"
+                                Text="Dark"
+                                Command="{Binding SetThemeCommand}"
+                                CommandParameter="Dark"
+                                CornerRadius="18"
+                                FontSize="13"
+                                Padding="8,12"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                                TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" Binding="{Binding IsDarkTheme}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    <Setter Property="TextColor" Value="White" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Palettes -->
+            <Border StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="20">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Color palette"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                    <Label Text="Pick a vibe — buttons, streaks, and accents update instantly."
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+
+                    <CollectionView ItemsSource="{Binding Palettes}" SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:PaletteOption">
+                                <Border StrokeThickness="1.5"
+                                        StrokeShape="RoundRectangle 20"
+                                        Padding="14"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource ChipLight}, Dark={StaticResource ChipDark}}">
+                                    <Border.Stroke>
+                                        <SolidColorBrush Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+                                    </Border.Stroke>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Stroke">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="{DynamicResource Primary}" />
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource AccentSoft}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SettingsViewModel}}, Path=SelectPaletteCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                        <Border Grid.Column="0"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 18"
+                                                BackgroundColor="{Binding Swatch}"
+                                                VerticalOptions="Center" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                                        <Label Grid.Column="2"
+                                               Text="✓"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               TextColor="{DynamicResource Primary}"
+                                               IsVisible="{Binding IsSelected}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Made for soft streaks, kind resets, and rewards that feel worth it."
+                   FontSize="12"
+                   HorizontalTextAlignment="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

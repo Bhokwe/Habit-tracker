@@ -4,13 +4,27 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Habit_tracker"
-    Title="Habit_tracker"
-    Shell.TitleColor="MediumPurple"
-    Shell.BackgroundColor="BlanchedAlmond">
+    Title="Habit Tracker"
+    Shell.NavBarIsVisible="False"
+    Shell.BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}"
+    Shell.ForegroundColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+    Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+    Shell.TabBarForegroundColor="{DynamicResource Primary}"
+    Shell.TabBarUnselectedColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+    Shell.TabBarTitleColor="{DynamicResource Primary}">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-
+    <TabBar>
+        <ShellContent
+            Title="Today"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+        <ShellContent
+            Title="Rewards"
+            ContentTemplate="{DataTemplate local:RewardsPage}"
+            Route="RewardsPage" />
+        <ShellContent
+            Title="Look"
+            ContentTemplate="{DataTemplate local:SettingsPage}"
+            Route="SettingsPage" />
+    </TabBar>
 </Shell>

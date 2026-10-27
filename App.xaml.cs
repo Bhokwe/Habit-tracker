@@ -1,15 +1,17 @@
-﻿namespace Habit_tracker
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+﻿using Habit_tracker.Services;
 
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+namespace Habit_tracker;
+
+public partial class App : Application
+{
+    public App()
+    {
+        InitializeComponent();
+        ThemeService.Initialize();
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new AppShell());
     }
 }

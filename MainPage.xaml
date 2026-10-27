@@ -1,97 +1,342 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Habit_tracker.ViewModels"
+             xmlns:models="clr-namespace:Habit_tracker.Models"
              x:Class="Habit_tracker.MainPage"
-             Title="Habit Tracker"
-             >
+             x:DataType="viewmodels:MainViewModel"
+             Title="Today"
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
 
-    <VerticalStackLayout 
-        Padding="50"
-        Spacing="20"
-        Margin="50">
-        <Label 
-               Text = "Welcome to your Habit Tracker"
-               FontSize="Title"
-               VerticalOptions="Center"
-               HorizontalOptions="Center"
-               TextColor="Purple"/>
-                
-        <Label
-               Text=" Habits take 21 days to build but it only starts with Day 1"
-               FontSize="Body" 
-               VerticalOptions="Center"
-               HorizontalOptions="Center"
-               TextColor="MediumPurple"/>
-        
-        
-        <Grid ColumnDefinitions="*,Auto" Margin="0,20">
-            <Entry Grid.Column="0"
-                     Placeholder="Enter a new habit"
-                     Text="{Binding NewHabitName}"
-                     TextColor="Purple"/>
+    <ScrollView>
+        <VerticalStackLayout Padding="22,28,22,28" Spacing="16">
 
-            <Button Grid.Column="1"
-                    Text="Add habit"
-                    Command="{Binding AddHabitCommand}"
-                    BackgroundColor="Beige"
-                    TextColor="Purple"/>
-        </Grid>
-        <CollectionView ItemsSource="{Binding Habits}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    
-                    <Border Stroke="Black" 
-                            StrokeShape="RoundRectangle 10" 
-                            Padding="10" Margin="0,5"
-                            BackgroundColor="Beige">
+            <!-- Greeting -->
+            <VerticalStackLayout Spacing="2">
+                <Label Text="{Binding TodayGreeting}"
+                       FontSize="14"
+                       TextColor="{DynamicResource Primary}" />
+                <Label Text="Your streaks"
+                       FontSize="34"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                <Label Text="{Binding TodayDateLabel}"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+            </VerticalStackLayout>
 
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer 
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=TapHabitCommand}"
-                                CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
-                        
-                        
-                        <Border.Shadow>
-                            <Shadow Brush="Black"
-                                Offset="2,2"
-                                Radius="5"
-                                Opacity="0.2"/>
-                        </Border.Shadow>
+            <!-- Encouragement -->
+            <Border StrokeThickness="0"
+                    IsVisible="{Binding ShowEncouragement}"
+                    BackgroundColor="{AppThemeBinding Light=#FFF3E8, Dark=#3A2E24}"
+                    StrokeShape="RoundRectangle 22"
+                    Padding="18">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="🌱 Soft reset"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="{DynamicResource StreakAccent}" />
+                        <Label Text="{Binding EncouragementMessage}"
+                               FontSize="13"
+                               LineBreakMode="WordWrap"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="Got it"
+                            Command="{Binding DismissEncouragementCommand}"
+                            BackgroundColor="{DynamicResource StreakAccent}"
+                            TextColor="White"
+                            CornerRadius="16"
+                            Padding="14,10"
+                            FontSize="12"
+                            VerticalOptions="Center" />
+                </Grid>
+            </Border>
 
-                        <Grid ColumnDefinitions="*, Auto">
-
-                            <VerticalStackLayout Grid.Column="0" 
-                                                 VerticalOptions="Center" 
-                                                 Spacing="0">
-
-                                <Label Text="{Binding Title}" 
-                                       TextColor="Black"
-                                       FontSize="16"
-                                       FontAttributes="Bold" />
-
-                                <Label Text="{Binding StreakCount, StringFormat='Fire: {0} Days'}" 
-                                       TextColor="#FF4500"
-                                       FontSize="12"
-                                       FontAttributes="Italic" />
-                            </VerticalStackLayout>
-
-                            <CheckBox Grid.Column="1" 
-                                      IsChecked="{Binding IsCompleted}"
-                                      Color="Purple"
-                                      IsEnabled="False" />
-                        </Grid>
-
-
+            <!-- Hero progress -->
+            <Border StrokeThickness="0"
+                    BackgroundColor="{DynamicResource AccentSoft}"
+                    StrokeShape="RoundRectangle 28"
+                    Padding="22">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                    <VerticalStackLayout Grid.Column="0" Spacing="8" VerticalOptions="Center">
+                        <Label Text="{Binding ProgressSummary}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray900}}" />
+                        <ProgressBar Progress="{Binding TodayProgress}"
+                                     ProgressColor="{DynamicResource Primary}"
+                                     HeightRequest="10" />
+                        <Label Text="{Binding WeekOverview}"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray600}}" />
+                    </VerticalStackLayout>
+                    <Border Grid.Column="1"
+                            WidthRequest="72"
+                            HeightRequest="72"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 36"
+                            BackgroundColor="{DynamicResource Primary}"
+                            VerticalOptions="Center">
+                        <Label Text="{Binding ProgressPercentLabel}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
                     </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                </Grid>
+            </Border>
 
-    </VerticalStackLayout>
+            <!-- Categories -->
+            <Border StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Categories"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Grid.Column="0"
+                               Placeholder="Fitness, Study…"
+                               Text="{Binding NewCategoryName}"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Button Grid.Column="1"
+                                Text="+"
+                                Command="{Binding AddCategoryCommand}"
+                                BackgroundColor="{DynamicResource Primary}"
+                                TextColor="White"
+                                CornerRadius="18"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                Padding="0"
+                                FontSize="22"
+                                FontAttributes="Bold" />
+                    </Grid>
+                    <CollectionView ItemsSource="{Binding Categories}" HeightRequest="40">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Category">
+                                <Border StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 16"
+                                        Padding="12,8"
+                                        BackgroundColor="{Binding ColorHex}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=FilterByCommand}"
+                                            CommandParameter="{Binding Name}" />
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="6">
+                                        <Label Text="{Binding Name}" TextColor="White" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="×" TextColor="White" FontSize="14" Opacity="0.85" VerticalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=DeleteCategoryCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Text="{Binding SelectedFilter, StringFormat='Filter: {0}  ·  tap All to reset'}"
+                            Command="{Binding FilterByCommand}"
+                            CommandParameter="All"
+                            FontSize="12"
+                            Padding="0"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource Primary}"
+                            HorizontalOptions="Start" />
+                </VerticalStackLayout>
+            </Border>
 
-    
+            <!-- Create habit -->
+            <Border StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="18">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Create a streak"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                    <Entry Placeholder="What do you want to track?"
+                           Text="{Binding NewHabitName}"
+                           ReturnCommand="{Binding AddHabitCommand}"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
 
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Label Grid.Column="0" Text="× / week" VerticalOptions="Center" FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                        <Entry Grid.Column="1"
+                               Placeholder="4 weekly · 7 daily"
+                               Text="{Binding NewHabitTargetText}"
+                               Keyboard="Numeric"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Reminder" VerticalOptions="Center" FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding NewReminderEnabled}"
+                                OnColor="{DynamicResource Primary}" />
+                    </Grid>
+                    <TimePicker Time="{Binding NewReminderTime}"
+                                IsVisible="{Binding NewReminderEnabled}" />
+
+                    <Button Text="+ Details &amp; category"
+                            Command="{Binding ToggleAdvancedAddCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource Primary}"
+                            FontSize="13"
+                            Padding="0"
+                            HorizontalOptions="Start" />
+
+                    <VerticalStackLayout Spacing="10" IsVisible="{Binding ShowAdvancedAdd}">
+                        <Editor Placeholder="Why / how? e.g. Biceps + triceps Monday"
+                                Text="{Binding NewHabitDescription}"
+                                AutoSize="TextChanges"
+                                HeightRequest="64"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource MutedLight}, Dark={StaticResource ChipDark}}"
+                                TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Picker Title="Category"
+                                ItemsSource="{Binding Categories}"
+                                ItemDisplayBinding="{Binding Name}"
+                                SelectedItem="{Binding SelectedCategory}" />
+                    </VerticalStackLayout>
+
+                    <Button Text="Start my streak"
+                            Command="{Binding AddHabitCommand}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="White"
+                            CornerRadius="22"
+                            Padding="16,14"
+                            FontAttributes="Bold"
+                            FontSize="15" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Today's habits"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   Margin="4,8,0,0"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+            <CollectionView ItemsSource="{Binding Habits}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="28" Spacing="6">
+                        <Label Text="✨" FontSize="36" HorizontalTextAlignment="Center" />
+                        <Label Text="No habits yet"
+                               FontSize="17" FontAttributes="Bold" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                        <Label Text="Create one above — keep it tiny and kind."
+                               FontSize="13" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Habit">
+                        <SwipeView Margin="0,0,0,12">
+                            <SwipeView.RightItems>
+                                <SwipeItems Mode="Reveal">
+                                    <SwipeItem Text="Remove"
+                                               BackgroundColor="{StaticResource Danger}"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=DeleteHabitCommand}"
+                                               CommandParameter="{Binding .}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Border StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 24"
+                                    Padding="16"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}">
+                                <Border.Shadow>
+                                    <Shadow Brush="{StaticResource Gray400}" Offset="0,6" Radius="16" Opacity="0.12" />
+                                </Border.Shadow>
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsCompleted}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource AccentSoft}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=TapHabitCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Border Grid.Column="0"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            StrokeShape="RoundRectangle 22"
+                                            StrokeThickness="2"
+                                            Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray500}}"
+                                            BackgroundColor="Transparent"
+                                            VerticalOptions="Start">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsCompleted}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{DynamicResource Success}" />
+                                                <Setter Property="Stroke" Value="{DynamicResource Success}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label Text="✓" FontSize="18" FontAttributes="Bold" TextColor="White"
+                                               HorizontalOptions="Center" VerticalOptions="Center"
+                                               IsVisible="{Binding IsCompleted}" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding StreakEmoji}" FontSize="16" VerticalOptions="Center" />
+                                            <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"
+                                                   VerticalOptions="Center"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding StreakDisplay}" FontSize="12"
+                                               TextColor="{DynamicResource StreakAccent}" />
+                                        <Label Text="{Binding WeekTallyDisplay}" FontSize="13"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                                        <Label Text="{Binding WeekProgressLabel}" FontSize="11"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                                        <Border IsVisible="{Binding HasCategory}" StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 12" Padding="8,3"
+                                                HorizontalOptions="Start" BackgroundColor="{Binding CategoryColor}">
+                                            <Label Text="{Binding CategoryName}" FontSize="11" TextColor="White" />
+                                        </Border>
+                                        <Label Text="{Binding Description}" IsVisible="{Binding HasDescription}"
+                                               FontSize="12" LineBreakMode="WordWrap"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}" />
+                                        <Label Text="{Binding ReminderLabel}" FontSize="11"
+                                               TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}" />
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout Grid.Column="2" Spacing="2" VerticalOptions="Start">
+                                        <Button Text="⏰" FontSize="14" WidthRequest="36" HeightRequest="36" Padding="0"
+                                                CornerRadius="18" BackgroundColor="Transparent"
+                                                TextColor="{DynamicResource Primary}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=EditReminderCommand}"
+                                                CommandParameter="{Binding .}" />
+                                        <Button Text="✕" FontSize="13" WidthRequest="36" HeightRequest="36" Padding="0"
+                                                CornerRadius="18" BackgroundColor="Transparent"
+                                                TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray500}}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=DeleteHabitCommand}"
+                                                CommandParameter="{Binding .}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
