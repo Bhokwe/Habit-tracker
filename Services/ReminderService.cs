@@ -37,10 +37,7 @@ public class ReminderService
 
             var allowed = await EnsurePermissionAsync();
             if (!allowed)
-            {
-                habit.ReminderEnabled = false;
                 return;
-            }
 
             var timeOfDay = TimeSpan.FromTicks(habit.ReminderTimeTicks);
             if (timeOfDay < TimeSpan.Zero || timeOfDay >= TimeSpan.FromDays(1))
@@ -79,8 +76,7 @@ public class ReminderService
         }
         catch
         {
-            // Never crash the app because of notifications
-            habit.ReminderEnabled = false;
+            // Keep the chosen time even if Windows cannot show a toast yet.
         }
     }
 

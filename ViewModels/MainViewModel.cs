@@ -306,10 +306,6 @@ public partial class MainViewModel : ObservableObject
         ApplyWeekTally(created, [], StartOfWeek(DateTime.Today), DateTime.Today);
         await _reminders.ScheduleAsync(created);
 
-        // Permission may have turned reminder off
-        if (created.ReminderEnabled != NewReminderEnabled)
-            await _db.UpdateAsync(created);
-
         _allHabits.Add(created);
         ResetForm();
         ApplyFilter();
@@ -447,6 +443,14 @@ public partial class MainViewModel : ObservableObject
     async Task EditReminder(Habit? habit)
     {
         if (habit == null) return;
+
+        // Windows popup dialogs crash the unpackaged app. Use the on-page time picker instead.
+        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+        {
+            await EditHabit(habit);
+            NewReminderEnabled = true;
+            return;
+        }
 
         var action = await Shell.Current.DisplayActionSheet(
             $"Reminder for \"{habit.Title}\"",

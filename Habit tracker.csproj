@@ -27,13 +27,8 @@
 		<ApplicationId>com.companyname.habittracker</ApplicationId>
 
 		<!-- Versions -->
-<<<<<<< Updated upstream
-		<ApplicationDisplayVersion>1.1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>2</ApplicationVersion>
-=======
 		<ApplicationDisplayVersion>1.2</ApplicationDisplayVersion>
 		<ApplicationVersion>3</ApplicationVersion>
->>>>>>> Stashed changes
 
 		<WindowsPackageType>None</WindowsPackageType>
 
@@ -94,21 +89,5 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
 	</ItemGroup>
-
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-		<WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
-		<SelfContained>false</SelfContained>
-		<PublishTrimmed>false</PublishTrimmed>
-		<PublishSingleFile>false</PublishSingleFile>
-		<PublishReadyToRun>false</PublishReadyToRun>
-	</PropertyGroup>
-
-	<Target Name="CopyWindowsAppXaml" AfterTargets="Publish" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-		<PropertyGroup>
-			<_AppXaml>$(OutputPath)Platforms\Windows\App.xbf</_AppXaml>
-		</PropertyGroup>
-		<MakeDir Directories="$(PublishDir)Platforms\Windows" />
-		<Copy SourceFiles="$(_AppXaml)" DestinationFiles="$(PublishDir)Platforms\Windows\App.xbf" Condition="Exists('$(_AppXaml)')" />
-	</Target>
 
 </Project>

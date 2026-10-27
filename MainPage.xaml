@@ -190,7 +190,7 @@
                                TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
                         <Switch Grid.Column="1"
                                 IsToggled="{Binding NewReminderEnabled}"
-                                OnColor="{DynamicResource Primary}" />
+                                OnColor="{StaticResource Primary}" />
                     </Grid>
                     <TimePicker Time="{Binding NewReminderTime}"
                                 IsVisible="{Binding NewReminderEnabled}" />
