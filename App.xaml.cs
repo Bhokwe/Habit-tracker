@@ -19,7 +19,9 @@ public partial class App : Application
         }
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
             Debug.WriteLine($"Unhandled: {e.ExceptionObject}");
+        };
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {

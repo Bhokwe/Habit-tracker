@@ -8,7 +8,14 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         // Ensure SQLite native binaries are loaded on all platforms
-        SQLitePCL.Batteries_V2.Init();
+        try
+        {
+            SQLitePCL.Batteries_V2.Init();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"SQLite init failed: {ex}");
+        }
 
         var builder = MauiApp.CreateBuilder();
         builder
@@ -23,9 +30,9 @@ public static class MauiProgram
         {
             builder.UseLocalNotification();
         }
-        catch
+        catch (Exception ex)
         {
-            // Notifications are optional — app must still launch without them
+            System.Diagnostics.Debug.WriteLine($"Notifications failed: {ex}");
         }
 
 #if DEBUG

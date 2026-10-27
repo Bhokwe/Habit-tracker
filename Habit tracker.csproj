@@ -40,15 +40,22 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<!-- Windows unpackaged publish: include WinAppSDK locally and never trim (avoids XAML 0xc000027b crash) -->
+	<!-- Windows unpackaged: use the installed Windows App SDK (self-contained XAML dll crashed on launch) -->
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-		<EnableMsixTooling>true</EnableMsixTooling>
+		<WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
+		<SelfContained>false</SelfContained>
 		<PublishTrimmed>false</PublishTrimmed>
 		<PublishSingleFile>false</PublishSingleFile>
 		<PublishReadyToRun>false</PublishReadyToRun>
-		<SelfContained>true</SelfContained>
 	</PropertyGroup>
+
+	<Target Name="CopyWindowsAppXaml" AfterTargets="Publish" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<PropertyGroup>
+			<_AppXaml>$(OutputPath)Platforms\Windows\App.xbf</_AppXaml>
+		</PropertyGroup>
+		<MakeDir Directories="$(PublishDir)Platforms\Windows" />
+		<Copy SourceFiles="$(_AppXaml)" DestinationFiles="$(PublishDir)Platforms\Windows\App.xbf" Condition="Exists('$(_AppXaml)')" />
+	</Target>
 
 	<!-- Android: avoid aggressive AOT edge-cases on sideloaded test APKs -->
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
