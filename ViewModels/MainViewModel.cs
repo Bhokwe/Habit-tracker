@@ -31,6 +31,13 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] bool showAdvancedAdd;
     [ObservableProperty] bool newReminderEnabled;
     [ObservableProperty] TimeSpan newReminderTime = TimeSpan.FromHours(9);
+    [ObservableProperty] bool isEditing;
+    [ObservableProperty] string formHeading = "Create a streak";
+    [ObservableProperty] string submitLabel = "Start my streak";
+
+    int? _editingHabitId;
+
+    public Func<Task>? ScrollToForm { get; set; }
     [ObservableProperty] int completedTodayCount;
     [ObservableProperty] int totalHabitsCount;
     [ObservableProperty] double todayProgress;
@@ -217,13 +224,39 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    async Task EditHabit(Habit? habit)
+    {
+        if (habit == null) return;
+
+        _editingHabitId = habit.Id;
+        IsEditing = true;
+        FormHeading = "Edit habit";
+        SubmitLabel = "Save changes";
+        NewHabitName = habit.Title;
+        NewHabitDescription = habit.Description;
+        NewHabitTargetText = habit.TargetPerWeek.ToString();
+        NewReminderEnabled = habit.ReminderEnabled;
+        NewReminderTime = habit.ReminderTime;
+        SelectedCategory = Categories.FirstOrDefault(c => c.Id == habit.CategoryId);
+        ShowAdvancedAdd = habit.HasDescription || habit.HasCategory;
+
+        if (ScrollToForm != null)
+            await ScrollToForm();
+    }
+
+    [RelayCommand]
+    void CancelEdit() => ResetForm();
+
+    [RelayCommand]
     async Task AddHabit()
     {
         var name = NewHabitName.Trim();
         if (string.IsNullOrWhiteSpace(name))
             return;
 
-        if (_allHabits.Any(h => h.Title.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        if (_allHabits.Any(h =>
+                h.Id != _editingHabitId &&
+                h.Title.Equals(name, StringComparison.OrdinalIgnoreCase)))
         {
             await Shell.Current.DisplayAlert("Already exists", $"\"{name}\" is already on your list.", "OK");
             return;
@@ -233,7 +266,32 @@ public partial class MainViewModel : ObservableObject
         if (target < 0) target = 0;
         if (target > 7) target = 7;
 
-        var habit = new Habit
+        if (_editingHabitId is int editingId)
+        {
+            var habit = _allHabits.FirstOrDefault(h => h.Id == editingId);
+            if (habit == null)
+            {
+                ResetForm();
+                return;
+            }
+
+            habit.Title = name;
+            habit.Description = NewHabitDescription.Trim();
+            habit.CategoryId = SelectedCategory?.Id ?? 0;
+            habit.TargetPerWeek = target;
+            habit.ReminderEnabled = NewReminderEnabled;
+            habit.ReminderTimeTicks = NewReminderTime.Ticks;
+
+            ApplyCategory(habit, Categories.ToList());
+            await _reminders.ScheduleAsync(habit);
+            await _db.UpdateAsync(habit);
+            habit.NotifyDisplay();
+            ResetForm();
+            ApplyFilter();
+            return;
+        }
+
+        var created = new Habit
         {
             Title = name,
             Description = NewHabitDescription.Trim(),
@@ -243,24 +301,34 @@ public partial class MainViewModel : ObservableObject
             ReminderTimeTicks = NewReminderTime.Ticks
         };
 
-        await _db.SaveHabitsAsync(habit);
-        ApplyCategory(habit, Categories.ToList());
-        ApplyWeekTally(habit, [], StartOfWeek(DateTime.Today), DateTime.Today);
-        await _reminders.ScheduleAsync(habit);
+        await _db.SaveHabitsAsync(created);
+        ApplyCategory(created, Categories.ToList());
+        ApplyWeekTally(created, [], StartOfWeek(DateTime.Today), DateTime.Today);
+        await _reminders.ScheduleAsync(created);
 
         // Permission may have turned reminder off
-        if (habit.ReminderEnabled != NewReminderEnabled)
-            await _db.UpdateAsync(habit);
+        if (created.ReminderEnabled != NewReminderEnabled)
+            await _db.UpdateAsync(created);
 
-        _allHabits.Add(habit);
+        _allHabits.Add(created);
+        ResetForm();
+        ApplyFilter();
+        UpdateProgress();
+    }
+
+    void ResetForm()
+    {
+        _editingHabitId = null;
+        IsEditing = false;
+        FormHeading = "Create a streak";
+        SubmitLabel = "Start my streak";
         NewHabitName = string.Empty;
         NewHabitDescription = string.Empty;
         NewHabitTargetText = "4";
         NewReminderEnabled = false;
         NewReminderTime = TimeSpan.FromHours(9);
         ShowAdvancedAdd = false;
-        ApplyFilter();
-        UpdateProgress();
+        SelectedCategory = null;
     }
 
     [RelayCommand]

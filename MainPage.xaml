@@ -8,7 +8,7 @@
              Title="Today"
              BackgroundColor="{AppThemeBinding Light={StaticResource PageLight}, Dark={StaticResource PageDark}}">
 
-    <ScrollView>
+    <ScrollView x:Name="CreateScroll">
         <VerticalStackLayout Padding="22,28,22,28" Spacing="16">
 
             <!-- Greeting -->
@@ -157,13 +157,14 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Create habit -->
-            <Border StrokeThickness="0"
+            <!-- Create or edit habit -->
+            <Border x:Name="CreateForm"
+                    StrokeThickness="0"
                     BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
                     StrokeShape="RoundRectangle 24"
                     Padding="18">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Create a streak"
+                    <Label Text="{Binding FormHeading}"
                            FontSize="16"
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
@@ -215,7 +216,14 @@
                                 SelectedItem="{Binding SelectedCategory}" />
                     </VerticalStackLayout>
 
-                    <Button Text="Start my streak"
+                    <Button Text="Cancel"
+                            Command="{Binding CancelEditCommand}"
+                            IsVisible="{Binding IsEditing}"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
+                            FontSize="14" />
+
+                    <Button Text="{Binding SubmitLabel}"
                             Command="{Binding AddHabitCommand}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="White"
@@ -247,6 +255,14 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Habit">
                         <SwipeView Margin="0,0,0,12">
+                            <SwipeView.LeftItems>
+                                <SwipeItems Mode="Reveal">
+                                    <SwipeItem Text="Edit"
+                                               BackgroundColor="{DynamicResource Primary}"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=EditHabitCommand}"
+                                               CommandParameter="{Binding .}" />
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
                             <SwipeView.RightItems>
                                 <SwipeItems Mode="Reveal">
                                     <SwipeItem Text="Remove"
@@ -320,6 +336,11 @@
                                     </VerticalStackLayout>
 
                                     <VerticalStackLayout Grid.Column="2" Spacing="2" VerticalOptions="Start">
+                                        <Button Text="✎" FontSize="14" WidthRequest="36" HeightRequest="36" Padding="0"
+                                                CornerRadius="18" BackgroundColor="Transparent"
+                                                TextColor="{DynamicResource Primary}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=EditHabitCommand}"
+                                                CommandParameter="{Binding .}" />
                                         <Button Text="⏰" FontSize="14" WidthRequest="36" HeightRequest="36" Padding="0"
                                                 CornerRadius="18" BackgroundColor="Transparent"
                                                 TextColor="{DynamicResource Primary}"

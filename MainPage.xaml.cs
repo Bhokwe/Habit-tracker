@@ -7,7 +7,11 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
-        BindingContext = new MainViewModel();
+        var viewModel = new MainViewModel
+        {
+            ScrollToForm = () => CreateScroll.ScrollToAsync(CreateForm, ScrollToPosition.Start, true)
+        };
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()
